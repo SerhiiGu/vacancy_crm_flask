@@ -34,7 +34,7 @@ def vacancy_history():
     return 'vacancy history'
 
 
-@app.route('/user/', methods=['GET'])
+@app.route('/user/', methods=['GET', 'POST'])
 def user_main_page():
     return 'user main page, dashboard'
 
