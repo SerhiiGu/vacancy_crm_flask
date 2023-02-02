@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 from flask import Flask
 from flask import request
 from lists_of_dicts import *
