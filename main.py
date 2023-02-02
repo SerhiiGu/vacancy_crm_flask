@@ -21,6 +21,7 @@ def show_vacancy_content(vacancy_id):
     for vacancy in vacancy_data:
         if vacancy['id'] == vacancy_id:
             return vacancy
+    return f'No vacancies with vacancy_id {vacancy_id} found!'
 
 
 @app.route('/vacancy/<vacancy_id>/events/', methods=['GET', 'POST'])
@@ -40,6 +41,7 @@ def show_event_content(vacancy_id, event_id):
     for event in events_data:
         if event['vacancy_id'] == vacancy_id and event['id'] == event_id:
             return event
+    return f'No events with vacancy_id {vacancy_id} and event_id {event_id} found!'
 
 
 @app.route('/vacancy/history/', methods=['GET'])
