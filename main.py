@@ -1,5 +1,8 @@
+from typing import Dict, List
+
 from flask import Flask
 from flask import request
+from lists_of_dicts import *
 
 app = Flask(__name__)
 
@@ -11,22 +14,34 @@ def index_page():
 
 @app.route('/vacancy/', methods=['GET', 'POST'])
 def vacancy():
-    return 'all vacancies'
+    return vacancy_data
 
 
-@app.route('/vacancy/<id>/', methods=['GET', 'PUT'])
-def vacancy_content():
-    return 'vacancy with id'
+@app.route('/vacancy/<vacancy_id>/', methods=['GET', 'PUT'])
+def show_vacancy_content(vacancy_id):
+    vacancy_id = int(vacancy_id)
+    for vacancy in vacancy_data:
+        if vacancy['id'] == vacancy_id:
+            return vacancy
 
 
-@app.route('/vacancy/<id>/events/', methods=['GET', 'POST'])
-def vacancy_events():
-    return 'vacancy events'
+@app.route('/vacancy/<vacancy_id>/events/', methods=['GET', 'POST'])
+def vacancy_events(vacancy_id):
+    event_list = []
+    vacancy_id = int(vacancy_id)
+    for event in events_data:
+        if event['vacancy_id'] == vacancy_id:
+            event_list.append(event)
+    return event_list
 
 
-@app.route('/vacancy/<id>/events/<event_id>/', methods=['GET', 'PUT'])
-def show_event_content():
-    return 'inside event with id'
+@app.route('/vacancy/<vacancy_id>/events/<event_id>/', methods=['GET', 'PUT'])
+def show_event_content(vacancy_id, event_id):
+    vacancy_id = int(vacancy_id)
+    event_id = int(event_id)
+    for event in events_data:
+        if event['vacancy_id'] == vacancy_id and event['id'] == event_id:
+            return event
 
 
 @app.route('/vacancy/history/', methods=['GET'])
@@ -39,7 +54,7 @@ def user_main_page():
     return 'user main page, dashboard'
 
 
-@app.route('/user/calendar', methods=['GET'])
+@app.route('/user/calendar/', methods=['GET'])
 def user_calendar():
     return 'user calendar'
 
@@ -65,4 +80,4 @@ def user_templates():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
