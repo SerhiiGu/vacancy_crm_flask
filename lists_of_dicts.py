@@ -1,3 +1,34 @@
+user_data = [
+    {
+        "id": 1,
+        "name": "John Doe",
+        "login": "johndoe",
+        "password": "qwze89D0hjAkdsfD",
+        "email": "jonhdoe1233241@gmail.com"
+    },
+    {
+        "id": 2,
+        "name": "John Smith",
+        "login": "johnsmith",
+        "password": "dfgk$hf4lgF4",
+        "email": "jonhS34ktfs@gmail.com"
+    },
+    {
+        "id": 3,
+        "name": "John Black",
+        "login": "johnblack",
+        "password": "qLOFs30jd3($2n",
+        "email": "jonhB3laC00k@hotmail.com"
+    },
+    {
+        "id": 4,
+        "name": "Shane Black",
+        "login": "shane1234",
+        "password": "shane87909black",
+        "email": "shaneblack45834@hotmail.com"
+    }
+]
+
 
 vacancy_data = [
     {
@@ -47,7 +78,7 @@ vacancy_data = [
 ]
 
 
-events_data = [
+event_data = [
     {
         "id": 1,
         "vacancy_id": 1,
