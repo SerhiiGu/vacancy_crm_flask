@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New vacancy</title>
+</head>
+<body>
+<form action="/vacancy/" method="POST">
+    <input type="text" name="position_name" placeholder="Position_name"><br/>
+    <input type="text" name="company" placeholder="Company"><br/>
+    <input type="text" name="description" placeholder="Description"><br/>
+    <input type="text" name="contact_ids" placeholder="Contact_ids"><br/>
+    <input type="text" name="comment" placeholder="Comment"><br/>
+    <input type="submit" value="Add vacancy">
+</form>
+<div>
+    {{vacancies}}
+</div>
+</body>
+</html>

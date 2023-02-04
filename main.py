@@ -1,6 +1,6 @@
-from flask import Flask
-from flask import request
+from flask import Flask, request, render_template
 from lists_of_dicts import *
+import db_processing
 
 app = Flask(__name__)
 
@@ -10,18 +10,35 @@ def index_page():
     return 'index page'
 
 
-@app.route("/vacancy/", methods=['GET', 'POST'])
+@app.route("/vacancy/", methods=['GET', 'POST', 'PUT'])
 def vacancy():
-    return vacancy_data
+    if request.method == 'POST':
+        position_name = request.form.get('position_name')
+        company = request.form.get('company')
+        description = request.form.get('description')
+        contact_ids = request.form.get('contact_ids')
+        comment = request.form.get('comment')
+        vacancy_data = {
+            "user_id": 1,
+            "creation_date": "04-02-2023",
+            "position_name": position_name,
+            "company": company,
+            "description": description,
+            "contact_ids": contact_ids,
+            "comment": comment
+        }
+        db_processing.insert_info("vacancy", vacancy_data)
+    elif request.method == 'PUT':
+        pass
+    result = db_processing.select_info("SELECT * FROM vacancy;")
+    return render_template('vacancy_add.html', vacancies=result)
 
 
 @app.route("/vacancy/<vacancy_id>/", methods=['GET', 'PUT'])
 def show_vacancy_content(vacancy_id):
     vacancy_id = int(vacancy_id)
-    for vacancy in vacancy_data:
-        if vacancy['id'] == vacancy_id:
-            return vacancy
-    return f'No vacancies with vacancy_id {vacancy_id} found!'
+    result = db_processing.select_info("SELECT * FROM vacancy where id='%s';" % vacancy_id)
+    return result
 
 
 @app.route("/vacancy/<vacancy_id>/events/", methods=['GET', 'POST'])
@@ -45,7 +62,7 @@ def show_event_content(vacancy_id, event_id):
 
 
 @app.route("/vacancy/<vacancy_id>/history/", methods=['GET'])
-def vacancy_history(vacancy_id):
+def vacancy_history():
     return 'vacancy history'
 
 
