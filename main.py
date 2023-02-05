@@ -1,6 +1,4 @@
 from flask import Flask, request, render_template
-import datetime
-from lists_of_dicts import *
 import db_processing
 
 app = Flask(__name__)
@@ -16,7 +14,6 @@ def vacancy():
     if request.method == 'POST':
         vacancy_data = {
             "user_id": 1,
-            "creation_date": "04-02-2023",
             "position_name": request.form.get('position_name'),
             "company": request.form.get('company'),
             "description": request.form.get('description'),
@@ -42,7 +39,6 @@ def vacancy_events(vacancy_id):
         event_data = {
             "vacancy_id": vacancy_id,
             "description": request.form.get('description'),
-            "event_date": datetime.datetime.today().strftime('%d-%m-%Y'),
             "title": request.form.get('title'),
             "due_to_date": request.form.get('due_to_date'),
         }
@@ -53,12 +49,8 @@ def vacancy_events(vacancy_id):
 
 @app.route("/vacancy/<vacancy_id>/events/<event_id>/", methods=['GET', 'PUT'])
 def show_event_content(vacancy_id, event_id):
-    vacancy_id = int(vacancy_id)
-    event_id = int(event_id)
-    for event in event_data:
-        if event['vacancy_id'] == vacancy_id and event['id'] == event_id:
-            return event
-    return f'No events with vacancy_id {vacancy_id} and event_id {event_id} found!'
+    result = db_processing.select_info("SELECT * FROM event where vacancy_id='%s' and id='%s';" % (vacancy_id, event_id))
+    return result
 
 
 @app.route("/vacancy/<vacancy_id>/history/", methods=['GET'])

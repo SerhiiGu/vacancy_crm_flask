@@ -13,7 +13,7 @@ def select_info(query):
 def insert_info(table_name, data):
     columns = ', '.join(data.keys())
     placeholders = ':' + ', :'.join(data.keys())
-    query = 'INSERT INTO %s (%s) VALUES (%s)' % (table_name, columns, placeholders)
+    #query = 'INSERT INTO %s (%s) VALUES (%s)' % (table_name, columns, placeholders)
     conn = sqlite3.connect('vacancy.db')
     c = conn.cursor()
     print(query, data)
