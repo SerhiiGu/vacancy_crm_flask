@@ -20,16 +20,19 @@ def vacancy():
             "contact_ids": request.form.get('contact_ids'),
             "comment": request.form.get('comment')
         }
-        db_processing.insert_info("vacancy", vacancy_data)
+        with db_processing.DB() as db:
+            db.insert("vacancy", vacancy_data)
     elif request.method == 'PUT':
         pass
-    result = db_processing.select_info("SELECT * FROM vacancy;")
+    with db_processing.DB() as db:
+        result = db.query("SELECT * FROM vacancy;")
     return render_template('vacancy_add.html', vacancies=result)
 
 
 @app.route("/vacancy/<vacancy_id>/", methods=['GET', 'PUT'])
 def show_vacancy_content(vacancy_id):
-    result = db_processing.select_info("SELECT * FROM vacancy where id='%s';" % vacancy_id)
+    with db_processing.DB() as db:
+        result = db.query("SELECT * FROM vacancy where id='%s';" % vacancy_id)
     return result
 
 
@@ -42,14 +45,17 @@ def vacancy_events(vacancy_id):
             "title": request.form.get('title'),
             "due_to_date": request.form.get('due_to_date'),
         }
-        db_processing.insert_info("event", event_data)
-    result = db_processing.select_info("SELECT * FROM event where vacancy_id='%s'" % vacancy_id)
+        with db_processing.DB() as db:
+            db.insert("event", event_data)
+    with db_processing.DB() as db:
+        result = db.query("SELECT * FROM event where vacancy_id='%s'" % vacancy_id)
     return render_template('event_add.html', vacancy_id=vacancy_id, events=result)
 
 
 @app.route("/vacancy/<vacancy_id>/events/<event_id>/", methods=['GET', 'PUT'])
 def show_event_content(vacancy_id, event_id):
-    result = db_processing.select_info("SELECT * FROM event where vacancy_id='%s' and id='%s';" % (vacancy_id, event_id))
+    with db_processing.DB() as db:
+        result = db.query("SELECT * FROM event where vacancy_id='%s' and id='%s';" % (vacancy_id, event_id))
     return result
 
 
