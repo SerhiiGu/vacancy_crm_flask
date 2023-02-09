@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Перегляд/оновлення івенту</title>
+</head>
+<body>
+<b>Івент {{event_id}} вакансії {{vacancy_id}}:</b> </br></br>
+{{event}}
+</br></br>Для зміни івенту заповніть форму:</br>
+<form action="/vacancy/{{vacancy_id}}/events/{{event_id}}/" method="POST">
+    <input type="text" name="description" placeholder="Description"><br/>
+    <input type="text" name="title" placeholder="Title"><br/>
+    <input type="text" name="due_to_date" placeholder="Due_to_date"><br/></br>
+    <input type="submit" value="Оновити івент">
+</form>
+
+</br><a href="/vacancy/{{vacancy_id}}/events/">Повернутися до вакансії</a>
+</body>
+</html>

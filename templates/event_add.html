@@ -2,17 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New event</title>
+    <title>Додавання/перегляд івентів</title>
 </head>
 <body>
+Для додавання івента до вакансії {{vacancy_id}} заповніть форму:</br></br>
 <form action="/vacancy/{{vacancy_id}}/events/" method="POST">
     <input type="text" name="description" placeholder="Description"><br/>
     <input type="text" name="title" placeholder="Title"><br/>
-    <input type="text" name="due_to_date" placeholder="Due_to_date"><br/>
-    <input type="submit" value="Add event">
+    <input type="text" name="due_to_date" placeholder="Due_to_date"><br/></br>
+    <input type="submit" value="Додати івент">
 </form>
+</br></br>Список івентів вакансії:</br></br>
 <div>
-    {{events}}
+    {% for event in events %}
+    <a href="/vacancy/{{vacancy_id}}/events/{{event[0]}}/">{{event}}</a>  </br>
+    {% endfor %}
 </div>
 </body>
 </html>

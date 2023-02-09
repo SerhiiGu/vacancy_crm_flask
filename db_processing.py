@@ -20,6 +20,11 @@ class DB:
         self.c.execute(query, data)
         self.conn.commit()
 
+    def update(self, query):
+        print(query)
+        self.c.execute(query)
+        self.conn.commit()
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.c.close()
         self.conn.close()
