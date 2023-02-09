@@ -16,14 +16,14 @@ class DB:
         columns = ', '.join(data.keys())
         placeholders = ':' + ', :'.join(data.keys())
         query = 'INSERT INTO %s (%s) VALUES (%s)' % (table_name, columns, placeholders)
-    #    print(query, data)
+#        print(query, data)
         self.c.execute(query, data)
         self.conn.commit()
 
     def update(self, query):
-        print(query)
         self.c.execute(query)
         self.conn.commit()
+#        print(query)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.c.close()

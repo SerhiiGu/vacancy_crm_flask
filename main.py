@@ -5,10 +5,6 @@ app = Flask(__name__)
 
 
 @app.route("/", methods=['GET'])
-def index_page():
-    return 'index page'
-
-
 @app.route("/vacancy/", methods=['GET', 'POST'])
 def vacancy():
     if request.method == 'POST':
