@@ -7,6 +7,7 @@ app = Flask(__name__)
 @app.route("/", methods=['GET'])
 @app.route("/vacancy/", methods=['GET', 'POST'])
 def vacancy():
+    vacancy_data = {}
     if request.method == 'POST':
         vacancy_data = {
             "user_id": 1,
@@ -16,15 +17,16 @@ def vacancy():
             "contact_ids": request.form.get('contact_ids'),
             "comment": request.form.get('comment')
         }
-        with db_processing.DB() as db:
-            db.insert("vacancy", vacancy_data)
     with db_processing.DB() as db:
+        if vacancy_data:
+            db.insert("vacancy", vacancy_data)
         result = db.query("SELECT * FROM vacancy;")
     return render_template('vacancy_add.html', vacancies=result)
 
 
 @app.route("/vacancy/<vacancy_id>/", methods=['GET', 'POST'])
 def show_vacancy_content(vacancy_id):
+    qry = ''
     if request.method == 'POST':
         qry = "UPDATE vacancy SET "
         x = 0
@@ -35,9 +37,9 @@ def show_vacancy_content(vacancy_id):
                 qry += f"{value}='{request.form.get(value)}'"
                 x = 1
         qry += f" WHERE id='{vacancy_id}';"
-        with db_processing.DB() as db:
-            db.update(qry)
     with db_processing.DB() as db:
+        if qry:
+            db.update(qry)
         vacancy_desc = db.query("SELECT * FROM vacancy where id='%s';" % vacancy_id)
         events = db.query("SELECT * FROM event where vacancy_id='%s'" % vacancy_id)
     return render_template('vacancy_update.html', vacancy_id=vacancy_id, vacancy_desc=vacancy_desc, events=events)
@@ -45,6 +47,7 @@ def show_vacancy_content(vacancy_id):
 
 @app.route("/vacancy/<vacancy_id>/events/", methods=['GET', 'POST'])
 def vacancy_events(vacancy_id):
+    event_data = {}
     if request.method == 'POST':
         event_data = {
             "vacancy_id": vacancy_id,
@@ -52,15 +55,16 @@ def vacancy_events(vacancy_id):
             "title": request.form.get('title'),
             "due_to_date": request.form.get('due_to_date'),
         }
-        with db_processing.DB() as db:
-            db.insert("event", event_data)
     with db_processing.DB() as db:
+        if event_data:
+            db.insert("event", event_data)
         result = db.query("SELECT * FROM event where vacancy_id='%s'" % vacancy_id)
     return render_template('event_add.html', vacancy_id=vacancy_id, events=result)
 
 
 @app.route("/vacancy/<vacancy_id>/events/<event_id>/", methods=['GET', 'POST'])
 def show_event_content(vacancy_id, event_id):
+    qry = ''
     if request.method == 'POST':
         qry = "UPDATE event SET "
         x = 0
@@ -71,9 +75,9 @@ def show_event_content(vacancy_id, event_id):
                 qry += f"{value}='{request.form.get(value)}'"
                 x = 1
         qry += f" WHERE id='{event_id}';"
-        with db_processing.DB() as db:
-            db.update(qry)
     with db_processing.DB() as db:
+        if qry:
+            db.update(qry)
         event = db.query("SELECT * FROM event where vacancy_id='%s' and id='%s';" % (vacancy_id, event_id))
     return render_template('event_update.html', vacancy_id=vacancy_id, event_id=event_id, event=event)
 

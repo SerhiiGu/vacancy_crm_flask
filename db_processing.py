@@ -23,7 +23,7 @@ class DB:
     def update(self, query):
         self.c.execute(query)
         self.conn.commit()
-#        print(query)
+#        print("query in class(update): " + query)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.c.close()
