@@ -1,7 +1,5 @@
 from flask import Flask, request, render_template
-
 import al_db
-import db_processing
 
 from models import Vacancy, Event
 
@@ -29,22 +27,21 @@ def vacancy():
 
 @app.route("/vacancy/<int:vacancy_id>/", methods=['GET', 'POST'])
 def show_vacancy_content(vacancy_id):
-    qry = ''
+    al_db.init_db()
     if request.method == 'POST':
-        qry = "UPDATE vacancy SET "
-        x = 0
-        for value in request.form:
-            if request.form.get(value) != '':
-                if x == 1:
-                    qry += ", "
-                qry += f"{value}='{request.form.get(value)}'"
-                x = 1
-        qry += f" WHERE id='{vacancy_id}';"
-    with db_processing.DB() as db:
-        if qry:
-            db.update(qry)
-        vacancy_desc = db.query("SELECT * FROM vacancy where id='%s';" % vacancy_id)
-        events = db.query("SELECT * FROM event where vacancy_id='%s'" % vacancy_id)
+        position_name = request.form.get('position_name')
+        company = request.form.get('company')
+        description = request.form.get('description')
+        contact_ids = request.form.get('contact_ids')
+        comment = request.form.get('comment')
+        al_db.db_session.query(Vacancy).filter(Vacancy.id == vacancy_id).update({
+            Vacancy.position_name: position_name, Vacancy.company: company, Vacancy.description: description,
+            Vacancy.contact_ids: contact_ids, Vacancy.comment: comment})
+        al_db.db_session.commit()
+    vacancy_desc = al_db.db_session.query(Vacancy.id, Vacancy.position_name, Vacancy.company, Vacancy.description,
+                    Vacancy.comment, Vacancy.contact_ids).where(Vacancy.id == vacancy_id).first()
+    events = al_db.db_session.query(Event.id, Event.title, Event.description,
+                                    Event.due_to_date).where(Event.vacancy_id == vacancy_id)
     return render_template('vacancy_update.html', vacancy_id=vacancy_id, vacancy_desc=vacancy_desc, events=events)
 
 
@@ -65,21 +62,16 @@ def vacancy_events(vacancy_id):
 
 @app.route("/vacancy/<int:vacancy_id>/events/<int:event_id>/", methods=['GET', 'POST'])
 def show_event_content(vacancy_id, event_id):
-    qry = ''
+    al_db.init_db()
     if request.method == 'POST':
-        qry = "UPDATE event SET "
-        x = 0
-        for value in request.form:
-            if request.form.get(value) != '':
-                if x == 1:
-                    qry += ", "
-                qry += f"{value}='{request.form.get(value)}'"
-                x = 1
-        qry += f" WHERE id='{event_id}';"
-    with db_processing.DB() as db:
-        if qry:
-            db.update(qry)
-        event = db.query("SELECT * FROM event where vacancy_id='%s' and id='%s';" % (vacancy_id, event_id))
+        description = request.form.get('description')
+        title = request.form.get('title')
+        due_to_date = request.form.get('due_to_date')
+        al_db.db_session.query(Event).filter(Event.id == event_id, Event.vacancy_id == vacancy_id).\
+            update({Event.title: title, Event.description: description, Event.due_to_date: due_to_date})
+        al_db.db_session.commit()
+    event = al_db.db_session.query(Event.id, Event.title, Event.description, Event.due_to_date).\
+        where(Event.id == event_id, Event.vacancy_id == vacancy_id).first()
     return render_template('event_update.html', vacancy_id=vacancy_id, event_id=event_id, event=event)
 
 

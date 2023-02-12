@@ -82,7 +82,7 @@ class Event(Base):
         self.status = status
 
     def __repr__(self):
-        return '<Event %r>' % self.name
+        return '<Event %r>' % self.title
 
 
 class Template(Base):

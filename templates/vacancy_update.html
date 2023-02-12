@@ -4,6 +4,11 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta charset="UTF-8">
     <title>Зміна вакансії  №{{vacancy_id}} / Перегляд її івентів</title>
+    <style type="text/css">
+    table {
+   width: 400px;
+    }
+    </style>
 </head>
 <body>
 <b>Вакансія</b> </br></br>
@@ -14,15 +19,18 @@
     {{event}}  </br>
     {% endfor %}
 </div>
-</br></br>Для зміни вакансії заповніть форму:</br>
+</br></br>Для оновлення вакансії оновіть форму:</br>
 <form action="/vacancy/{{vacancy_id}}/" method="POST">
-    <input type="text" name="position_name" placeholder="Position_name"><br/>
-    <input type="text" name="company" placeholder="Company"><br/>
-    <input type="text" name="description" placeholder="Description"><br/>
-    <input type="text" name="contact_ids" placeholder="Contact_ids"><br/>
-    <input type="text" name="comment" placeholder="Comment"><br/>
-    <input type="submit" value="Оновити вакансію">
+    <table>
+        <tr> <td>Position_name</td> <td><input type="text" name="position_name" value="{{vacancy_desc[1]}}"></td> </tr>
+        <tr> <td>Company</td> <td><input type="text" name="company" value="{{vacancy_desc[2]}}"></td> </tr>
+        <tr> <td>Description</td> <td><input type="text" name="description" value="{{vacancy_desc[3]}}"></td> </tr>
+        <tr> <td>Contact_ids</td> <td><input type="text" name="contact_ids" value="{{vacancy_desc[5]}}"></td> </tr>
+        <tr> <td>Comment</td> <td><input type="text" name="comment" value="{{vacancy_desc[4]}}"></td> </tr>
+        <tr> <td></td> <td><input type="submit" value="Оновити вакансію">
+    </table>
 </form>
+
 </br><a href="/vacancy/{{vacancy_id}}/events/">Додати/змінити івенти</a>
 </br><a href="/vacancy/">Список вакансій</a>
 </body>
