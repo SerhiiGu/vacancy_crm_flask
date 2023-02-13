@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 import al_db
 
 from models import Vacancy, Event
@@ -8,9 +8,13 @@ app = Flask(__name__)
 
 
 @app.route("/", methods=['GET'])
+def main_proc():
+    al_db.init_db()
+    return redirect('/vacancy/')
+
+
 @app.route("/vacancy/", methods=['GET', 'POST'])
 def vacancy():
-    al_db.init_db()
     if request.method == 'POST':
         position_name = request.form.get('position_name')
         company = request.form.get('company')
@@ -27,7 +31,6 @@ def vacancy():
 
 @app.route("/vacancy/<int:vacancy_id>/", methods=['GET', 'POST'])
 def show_vacancy_content(vacancy_id):
-    al_db.init_db()
     if request.method == 'POST':
         position_name = request.form.get('position_name')
         company = request.form.get('company')
@@ -47,7 +50,6 @@ def show_vacancy_content(vacancy_id):
 
 @app.route("/vacancy/<int:vacancy_id>/events/", methods=['GET', 'POST'])
 def vacancy_events(vacancy_id):
-    al_db.init_db()
     if request.method == 'POST':
         description = request.form.get('description')
         title = request.form.get('title')
@@ -62,7 +64,6 @@ def vacancy_events(vacancy_id):
 
 @app.route("/vacancy/<int:vacancy_id>/events/<int:event_id>/", methods=['GET', 'POST'])
 def show_event_content(vacancy_id, event_id):
-    al_db.init_db()
     if request.method == 'POST':
         description = request.form.get('description')
         title = request.form.get('title')
