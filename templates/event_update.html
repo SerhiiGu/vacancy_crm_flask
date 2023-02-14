@@ -11,20 +11,20 @@
     </style>
 </head>
 <body>
-<b>Івент {{event_id}} вакансії {{vacancy_id}}:</b> </br></br>
+<b>Івент {{event_id}} вакансії {{vacancy_id}}:</b> <br><br>
 {{event}}
-</br></br>Для оновлення івенту оновіть форму:</br>
+<br><br>Для оновлення івенту оновіть форму:<br>
 <form action="/vacancy/{{vacancy_id}}/events/{{event_id}}/" method="POST">
     <table>
-        <tr> <td>Title</td> <td><input type="text" name="title" value="{{event[1]}}"></td> </tr>
-        <tr> <td>Description</td> <td><input type="text" name="description" value="{{event[2]}}"></td> </tr>
-        <tr> <td>Due_to_date</td> <td><input type="text" name="due_to_date" value="{{event[3]}}"></td> </tr>
+        <tr> <td>Title</td> <td><input type="text" name="title" value="{{event.title}}"></td> </tr>
+        <tr> <td>Description</td> <td><input type="text" name="description" value="{{event.description}}"></td> </tr>
+        <tr> <td>Due_to_date</td> <td><input type="text" name="due_to_date" value="{{event.title}}"></td> </tr>
         <tr> <td></td> <td><input type="submit" value="Оновити івент"></td> </tr>
     </table>
 </form>
 
-</br><a href="/vacancy/{{vacancy_id}}/events/">Список івентів вакансії</a>
-</br><a href="/vacancy/{{vacancy_id}}/">Повернутися до вакансії</a>
-</br><a href="/vacancy/">Список вакансій</a>
+<br><a href="/vacancy/{{vacancy_id}}/events/">Список івентів вакансії</a>
+<br><a href="/vacancy/{{vacancy_id}}/">Повернутися до вакансії</a>
+<br><a href="/vacancy/">Список вакансій</a>
 </body>
 </html>

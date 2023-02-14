@@ -6,21 +6,21 @@
     <title>Додавання/перегляд вакансій</title>
 </head>
 <body>
-Щоб додати вакансію, заповніть форму: </br> </br>
+Щоб додати вакансію, заповніть форму: <br> <br>
 <form action="/vacancy/" method="POST">
-    <input type="text" name="position_name" placeholder="Position_name"><br/>
-    <input type="text" name="company" placeholder="Company"><br/>
-    <input type="text" name="description" placeholder="Description"><br/>
-    <input type="text" name="contact_ids" placeholder="Contact_ids"><br/>
-    <input type="text" name="comment" placeholder="Comment"><br/>
+    <input type="text" name="position_name" placeholder="Position_name"><br>
+    <input type="text" name="company" placeholder="Company"><br>
+    <input type="text" name="description" placeholder="Description"><br>
+    <input type="text" name="contact_ids" placeholder="Contact_ids"><br>
+    <input type="text" name="comment" placeholder="Comment"><br>
     <input type="submit" value="Додати вакансію">
 </form>
-</br><b>Список вакансій:</b></br>
+<br><b>Список вакансій:</b><br>
 <div>
     {% for vacancy in vacancies %}
-    <a href="/vacancy/{{vacancy[0]}}/">{{vacancy}}</a>  </br>
+    <a href="/vacancy/{{vacancy[0]}}/">{{vacancy}}</a>  <br>
     {% endfor %}
 </div>
-</br> Щоб змінити вакансію, перейдіть за посиланням.
+<br> Щоб змінити вакансію, перейдіть за посиланням.
 </body>
 </html>

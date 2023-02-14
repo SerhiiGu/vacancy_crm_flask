@@ -4,34 +4,51 @@
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <meta charset="UTF-8">
     <title>Зміна вакансії  №{{vacancy_id}} / Перегляд її івентів</title>
-    <style type="text/css">
-    table {
-   width: 400px;
-    }
+    <style>
+        th {
+        border: 1px solid black;
+        }
     </style>
 </head>
 <body>
-<b>Вакансія</b> </br></br>
-{{vacancy_desc}}</br></br>
-<b>має івенти:</b> </br></br>
+<b>Вакансія</b> <br><br>
+{{vacancy_desc}}<br><br>
+<b>має івенти:</b> <br><br>
 <div>
-    {% for event in events %}
-    {{event}}  </br>
-    {% endfor %}
-</div>
-</br></br>Для оновлення вакансії оновіть форму:</br>
-<form action="/vacancy/{{vacancy_id}}/" method="POST">
     <table>
-        <tr> <td>Position_name</td> <td><input type="text" name="position_name" value="{{vacancy_desc[1]}}"></td> </tr>
-        <tr> <td>Company</td> <td><input type="text" name="company" value="{{vacancy_desc[2]}}"></td> </tr>
-        <tr> <td>Description</td> <td><input type="text" name="description" value="{{vacancy_desc[3]}}"></td> </tr>
-        <tr> <td>Contact_ids</td> <td><input type="text" name="contact_ids" value="{{vacancy_desc[5]}}"></td> </tr>
-        <tr> <td>Comment</td> <td><input type="text" name="comment" value="{{vacancy_desc[4]}}"></td> </tr>
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Due_to_date</th>
+            </tr>
+        </thead>
+        <tbody>
+    {% for event in events %}
+            <tr>
+                <td style="border: 1px solid black;">{{event.id}}</td>
+                <td style="border: 1px solid black;">{{event.title}}</td>
+                <td style="border: 1px solid black;">{{event.description}}</td>
+                <td style="border: 1px solid black;">{{event.title}}</td>
+            </tr>
+    {% endfor %}
+        </tbody>
+    </table>
+</div>
+<br><br>Для оновлення вакансії оновіть форму:<br>
+<form action="/vacancy/{{vacancy_id}}/" method="POST">
+    <table style="width: 400px;">
+        <tr> <td>Position_name</td> <td><input type="text" name="position_name" value="{{vacancy_desc.position_name}}"></td> </tr>
+        <tr> <td>Company</td> <td><input type="text" name="company" value="{{vacancy_desc.company}}"></td> </tr>
+        <tr> <td>Description</td> <td><input type="text" name="description" value="{{vacancy_desc.description}}"></td> </tr>
+        <tr> <td>Contact_ids</td> <td><input type="text" name="contact_ids" value="{{vacancy_desc.contact_ids}}"></td> </tr>
+        <tr> <td>Comment</td> <td><input type="text" name="comment" value="{{vacancy_desc.comment}}"></td> </tr>
         <tr> <td></td> <td><input type="submit" value="Оновити вакансію">
     </table>
 </form>
 
-</br><a href="/vacancy/{{vacancy_id}}/events/">Додати/змінити івенти</a>
-</br><a href="/vacancy/">Список вакансій</a>
+<br><a href="/vacancy/{{vacancy_id}}/events/">Додати/змінити івенти</a>
+<br><a href="/vacancy/">Список вакансій</a>
 </body>
 </html>
