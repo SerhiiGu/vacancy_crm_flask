@@ -1,0 +1,8 @@
+.git*
+.idea
+.dockerignore
+*pycache*
+README.md
+1.py
+create_sqlite_db.py
+vacancy.db
