@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  flask:
+    build: .
+    ports:
+      - "7000:5000"
+    environment:
+      FLASK_DEBUG: "true"
+      DB_HOST: "postgres"
+    hostname: "flask"
+
+  postgres:
+    image: "postgres"
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "qwe123"
+    ports:
+      - "5432:5432"
+    hostname: "postgres"
+
+  pgadmin:
+    image: "dpage/pgadmin4"
+    restart: "always"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "admin@admin.admin"
+      PGADMIN_DEFAULT_PASSWORD: "qwe123"
+    ports:
+      - "7002:80"
+    depends_on:
+      - "postgres"
+    hostname: "pgadmin"
