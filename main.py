@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect
 import al_db
 
-from models import Vacancy, Event
+from models import Vacancy, Event, User
 
 
 app = Flask(__name__)
@@ -83,7 +83,16 @@ def vacancy_history():
 
 @app.route("/user/", methods=['GET', 'POST'])
 def user_main_page():
-    return 'user main page, dashboard'
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        login = request.form.get('login')
+        password = request.form.get('password')
+        add_user = User(name, email, login, password)
+        al_db.db_session.add(add_user)
+        al_db.db_session.commit()
+    result = al_db.db_session.query(User.id, User.name, User.email, User.login, User.password).all()
+    return render_template('user_add.html', users=result)
 
 
 @app.route("/user/calendar/", methods=['GET'])
