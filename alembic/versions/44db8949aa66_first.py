@@ -88,6 +88,8 @@ def upgrade() -> None:
     sa.UniqueConstraint('id')
     )
     # ### end Alembic commands ###
+    op.execute("INSERT into \"user\" (id, name, email, login, password) "
+               "VALUES (1, 'User1', 'nameuser1@mail.mail', 'user1', 'qwea11sdqw5ee8Awr');")
 
 
 def downgrade() -> None:
