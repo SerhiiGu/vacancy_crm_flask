@@ -1,8 +1,8 @@
 """first
 
-Revision ID: 44db8949aa66
+Revision ID: 3f323995c5aa
 Revises: 
-Create Date: 2023-02-21 09:00:05.493599
+Create Date: 2023-02-22 21:15:14.423535
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '44db8949aa66'
+revision = '3f323995c5aa'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -45,8 +45,12 @@ def upgrade() -> None:
     sa.Column('email', sa.String(length=127), nullable=False),
     sa.Column('login', sa.String(length=127), nullable=False),
     sa.Column('password', sa.String(length=127), nullable=False),
-    sa.Column('pop_server', sa.String(length=127), nullable=False),
-    sa.Column('smtp_server', sa.String(length=127), nullable=False),
+    sa.Column('pop_server', sa.String(length=127), nullable=True),
+    sa.Column('imap_server', sa.String(length=127), nullable=True),
+    sa.Column('smtp_server', sa.String(length=127), nullable=True),
+    sa.Column('pop_port', sa.Integer(), nullable=True),
+    sa.Column('imap_port', sa.Integer(), nullable=True),
+    sa.Column('smtp_port', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),

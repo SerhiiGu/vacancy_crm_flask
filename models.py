@@ -28,8 +28,12 @@ class EmailCredentials(Base):
     email = Column(String(127), unique=True, nullable=False)
     login = Column(String(127), nullable=False)
     password = Column(String(127), nullable=False)
-    pop_server = Column(String(127), nullable=False)
-    smtp_server = Column(String(127), nullable=False)
+    pop_server = Column(String(127), nullable=True)
+    imap_server = Column(String(127), nullable=True)
+    smtp_server = Column(String(127), nullable=True)
+    pop_port = Column(Integer, nullable=True)
+    imap_port = Column(Integer, nullable=True)
+    smtp_port = Column(Integer, nullable=True)
 
     def __init__(self, login, password):
         self.login = login

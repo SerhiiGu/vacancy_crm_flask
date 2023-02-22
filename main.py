@@ -1,7 +1,10 @@
+import datetime
+
 from flask import Flask, request, render_template, redirect
 import al_db
+import email_lib
 
-from models import Vacancy, Event, User
+from models import Vacancy, Event, User, EmailCredentials
 
 
 app = Flask(__name__)
@@ -100,9 +103,25 @@ def user_calendar():
     return 'user calendar'
 
 
-@app.route("/user/mail/", methods=['GET'])
+@app.route("/user/mail/", methods=['GET', 'POST'])
 def user_mail():
-    return 'user mail'
+    user_settings = al_db.db_session.query(EmailCredentials).filter_by(user_id=1).first()
+    email_obj = email_lib.EmailWrapper(
+        user_settings.login,
+        user_settings.password,
+        user_settings.email,
+        user_settings.smtp_server,
+        user_settings.smtp_port,
+        user_settings.pop_server,
+        user_settings.pop_port,
+        user_settings.imap_server,
+        user_settings.imap_port
+    )
+    if request.method == 'POST':
+        recipient = request.form.get('recipient')
+        message = request.form.get('message')
+        email_obj.send_email(message, recipient)
+    return render_template('send_email.html')
 
 
 @app.route("/user/settings/", methods=['GET', 'PUT'])
