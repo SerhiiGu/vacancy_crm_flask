@@ -125,7 +125,6 @@ def user_mail():
         protocol = request.form.get('protocol')
         if recipient and message:
             message = subject + message
-            print(subject, message)
             email_obj.send_email(recipient, message)
             return render_template('sent_email_sucess.html')
         if protocol == 'none':
