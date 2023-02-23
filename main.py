@@ -6,7 +6,6 @@ import email_lib
 
 from models import Vacancy, Event, User, EmailCredentials
 
-
 app = Flask(__name__)
 
 
@@ -45,7 +44,7 @@ def show_vacancy_content(vacancy_id):
             Vacancy.contact_ids: contact_ids, Vacancy.comment: comment})
         al_db.db_session.commit()
     vacancy_desc = al_db.db_session.query(Vacancy.id, Vacancy.position_name, Vacancy.company, Vacancy.description,
-                    Vacancy.comment, Vacancy.contact_ids).where(Vacancy.id == vacancy_id).first()
+                                          Vacancy.comment, Vacancy.contact_ids).where(Vacancy.id == vacancy_id).first()
     events = al_db.db_session.query(Event.id, Event.title, Event.description,
                                     Event.due_to_date).where(Event.vacancy_id == vacancy_id)
     return render_template('vacancy_update.html', vacancy_id=vacancy_id, vacancy_desc=vacancy_desc, events=events)
@@ -71,10 +70,10 @@ def show_event_content(vacancy_id, event_id):
         description = request.form.get('description')
         title = request.form.get('title')
         due_to_date = request.form.get('due_to_date')
-        al_db.db_session.query(Event).filter(Event.id == event_id, Event.vacancy_id == vacancy_id).\
+        al_db.db_session.query(Event).filter(Event.id == event_id, Event.vacancy_id == vacancy_id). \
             update({Event.title: title, Event.description: description, Event.due_to_date: due_to_date})
         al_db.db_session.commit()
-    event = al_db.db_session.query(Event.id, Event.title, Event.description, Event.due_to_date).\
+    event = al_db.db_session.query(Event.id, Event.title, Event.description, Event.due_to_date). \
         where(Event.id == event_id, Event.vacancy_id == vacancy_id).first()
     return render_template('event_update.html', vacancy_id=vacancy_id, event_id=event_id, event=event)
 
@@ -107,25 +106,34 @@ def user_calendar():
 def user_mail():
     user_settings = al_db.db_session.query(EmailCredentials).filter_by(user_id=1).first()
     email_obj = email_lib.EmailWrapper(
+        user_settings.email,
         user_settings.login,
         user_settings.password,
-        user_settings.email,
         user_settings.smtp_server,
-        user_settings.smtp_port,
-        user_settings.pop_server,
-        user_settings.pop_port,
         user_settings.imap_server,
-        user_settings.imap_port
+        user_settings.pop_server,
+        user_settings.smtp_port,
+        user_settings.imap_port,
+        user_settings.pop_port
     )
+    emails = []
+    protocol = 'none'
     if request.method == 'POST':
         recipient = request.form.get('recipient')
         message = request.form.get('message')
-        email_obj.send_email(message, recipient)
-    return render_template('send_email.html')
+        protocol = request.form.get('protocol')
+        if recipient and message:
+            email_obj.send_email(recipient, message)
+            return render_template('sent_email_sucess.html')
+        if protocol == 'none':
+            pass
+        else:
+            emails = email_obj.get_emails([1, 3], protocol)
+    return render_template('send_email.html', emails=emails, protocol=protocol)
 
 
 @app.route("/user/settings/", methods=['GET', 'PUT'])
-def user_settings():
+def user_settings_page():
     return 'user settings'
 
 

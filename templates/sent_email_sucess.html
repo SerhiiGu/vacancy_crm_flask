@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Лист успішно відправлено</title>
+</head>
+<body>
+<br><br>
+Лист успішно відправлено!
+<br><br>
+<p id="demo"></p>
+
+<script>
+var countDownDate = new Date().getSeconds() + 5;
+
+var x = setInterval(function() {
+  var now = new Date().getSeconds();
+  var distance = countDownDate - now;
+  document.getElementById("demo").innerHTML = "Перенаправляємо на попередню сторінку за " + distance + " секунд ";
+  if (distance <= 0) {
+    window.location.href = '/user/mail/';
+  }
+}, 1000);
+</script>
+
+</body>
+</html>

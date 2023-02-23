@@ -5,10 +5,27 @@
     <title>Send email</title>
 </head>
 <body>
-    <form action="/user/mail/" method="POST">
-        <input type="text" name="recipient" placeholder="Отримувач"><br>
-        <input type="text" name="message" placeholder="Тіло листа"><br>
-        <input type="submit" value="Надіслати лист">
-    </form>
+<form action="/user/mail/" method="POST">
+    <input type="text" size="32" name="recipient" placeholder="Отримувач"><br>
+    <textarea cols="32" rows="16" name="message" placeholder="Тіло листа"></textarea>
+    <br><br><br>
+    <label>Для отримання пошти оберіть протокол зі списку:</label><br><br>
+    <select name="protocol">
+        <option value="none">--Оберіть протокол--</option>
+        <option value="imap">imap</option>
+        <option value="pop3">pop3</option>
+    </select>
+    <br><br><br>
+    <input type="submit" value="Надіслати/отримати пошту">
+</form>
+<br><br><br>
+{% if emails %}
+    <b style="font-size:24px;">Отримуємо пошту по протоколу {{ protocol }}</b>
+    <br><br>
+    {% for email in emails %}
+        {{ email }}
+        <br><br>
+    {% endfor %}
+{% endif %}
 </body>
 </html>
