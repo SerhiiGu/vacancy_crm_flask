@@ -120,9 +120,12 @@ def user_mail():
     protocol = 'none'
     if request.method == 'POST':
         recipient = request.form.get('recipient')
+        subject = 'Subject: ' + request.form.get('subject') + '\n\n'
         message = request.form.get('message')
         protocol = request.form.get('protocol')
         if recipient and message:
+            message = subject + message
+            print(subject, message)
             email_obj.send_email(recipient, message)
             return render_template('sent_email_sucess.html')
         if protocol == 'none':
