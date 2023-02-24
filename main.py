@@ -126,7 +126,7 @@ def user_mail():
         if recipient and message:
             message = subject + message
             email_obj.send_email(recipient, message)
-            return render_template('sent_email_sucess.html')
+            return render_template('sent_email_success.html')
         if protocol == 'none':
             pass
         else:
