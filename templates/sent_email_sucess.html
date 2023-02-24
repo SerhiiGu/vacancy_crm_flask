@@ -11,11 +11,10 @@
 <p id="demo"></p>
 
 <script>
-var countDownDate = new Date().getSeconds() + 5;
+var distance = 5;
 
 var x = setInterval(function() {
-  var now = new Date().getSeconds();
-  var distance = countDownDate - now;
+  distance = distance - 1;
   document.getElementById("demo").innerHTML = "Перенаправляємо на попередню сторінку за " + distance + " секунд ";
   if (distance <= 0) {
     window.location.href = '/user/mail/';
