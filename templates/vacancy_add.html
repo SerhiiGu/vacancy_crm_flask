@@ -11,14 +11,21 @@
     <input type="text" name="position_name" placeholder="Position_name"><br>
     <input type="text" name="company" placeholder="Company"><br>
     <input type="text" name="description" placeholder="Description"><br>
-    <input type="text" name="contact_ids" placeholder="Contact_ids"><br>
+    <input type="text" name="contact_name" placeholder="Contact_name"><br>
+    <input type="text" name="contact_email" placeholder="Contact_email"><br>
+    <input type="text" name="contact_phone" placeholder="Contact_phone"><br>
     <input type="text" name="comment" placeholder="Comment"><br>
     <input type="submit" value="Додати вакансію">
 </form>
 <br><b>Список вакансій:</b><br>
 <div>
     {% for vacancy in vacancies %}
-    <a href="/vacancy/{{vacancy[0]}}/">{{vacancy}}</a>  <br>
+    <b>Vacancy:</b> <a href="/vacancy/{{vacancy[0]}}/">{{vacancy.id}}, {{vacancy.position_name}}, {{vacancy.company}}</a>,
+    <b>Destription:</b> {{vacancy.description}} ,
+    <b>Comment:</b> {{vacancy.comment}}
+    <br>
+    {{contact_result}}
+    <br>----------------------<br>
     {% endfor %}
 </div>
 <br> Щоб змінити вакансію, перейдіть за посиланням.

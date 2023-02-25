@@ -1,32 +1,53 @@
-version: "3.9"
+version: '3.9'
 
 services:
   flask:
     build: .
     ports:
-      - "7000:5000"
+      - 7000:5000
     environment:
-      FLASK_DEBUG: "true"
-      DB_HOST: "postgres"
-    hostname: "flask"
+      FLASK_DEBUG: true
+      DB_HOST: postgres
+      MONGO_HOST: mongo
+    hostname: flask
 
   postgres:
-    image: "postgres"
+    image: postgres
     environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "qwe123"
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: qwe123
     ports:
-      - "5432:5432"
-    hostname: "postgres"
+      - 5432:5432
+    hostname: postgres
 
   pgadmin:
-    image: "dpage/pgadmin4"
-    restart: "always"
+    image: dpage/pgadmin4
+    restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: "admin@admin.admin"
-      PGADMIN_DEFAULT_PASSWORD: "qwe123"
+      PGADMIN_DEFAULT_EMAIL: admin@admin.admin
+      PGADMIN_DEFAULT_PASSWORD: qwe123
     ports:
-      - "7002:80"
+      - 7002:80
     depends_on:
-      - "postgres"
-    hostname: "pgadmin"
+      - postgres
+    hostname: pgadmin
+
+  mongo:
+    image: mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: qwe123
+      MONGO_INITDB_DATABASE: vacancy_crm
+    ports:
+      - 27017:27017
+    hostname: mongo
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: qwe123
+      ME_CONFIG_MONGODB_URL: mongodb://root:qwe123@mongo:27017/

@@ -24,7 +24,7 @@
     <b style="font-size:24px;">Отримуємо пошту по протоколу {{ protocol }}</b>
     <br><br>
     {% for email in emails %}
-        {{ email }}
+        {{ email | safe }}
         <br><br>
     {% endfor %}
 {% endif %}

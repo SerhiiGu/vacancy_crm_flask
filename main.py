@@ -3,6 +3,8 @@ import datetime
 from flask import Flask, request, render_template, redirect
 import al_db
 import email_lib
+import mongo_lib
+from bson.objectid import ObjectId
 
 from models import Vacancy, Event, User, EmailCredentials
 
@@ -12,23 +14,38 @@ app = Flask(__name__)
 @app.route("/", methods=['GET'])
 def main_proc():
     al_db.init_db()
+    mongo_obj = mongo_lib.MongoLib('vacancy_crm', 'contacts')
+    mongo_obj.check_create_db()
     return redirect('/vacancy/')
 
 
 @app.route("/vacancy/", methods=['GET', 'POST'])
 def vacancy():
+    mongo_obj = mongo_lib.MongoLib('vacancy_crm', 'contacts')
     if request.method == 'POST':
         position_name = request.form.get('position_name')
         company = request.form.get('company')
         description = request.form.get('description')
-        contact_ids = request.form.get('contact_ids')
+        contact_name = request.form.get('contact_name')
+        contact_email = request.form.get('contact_email')
+        contact_phone = request.form.get('contact_phone')
         comment = request.form.get('comment')
-        current_vacancy = Vacancy(position_name, company, description, contact_ids, comment, status=1, user_id=1)
+
+        contact_id = mongo_obj.m_insert_one({"name": contact_name, "email": contact_email, "phone": contact_phone})
+
+        current_vacancy = Vacancy(position_name, company, description, str(contact_id), comment, status=1, user_id=1)
         al_db.db_session.add(current_vacancy)
         al_db.db_session.commit()
-    result = al_db.db_session.query(Vacancy.id, Vacancy.position_name,
-                                    Vacancy.company, Vacancy.description, Vacancy.comment).all()
-    return render_template('vacancy_add.html', vacancies=result)
+
+    result = al_db.db_session.query(Vacancy.id, Vacancy.position_name, Vacancy.company, Vacancy.description,
+                                    Vacancy.comment, Vacancy.contact_ids).all()
+    contact_result = []
+    for item in result:
+        contacts = item[5].split(',')
+        for one_contact in contacts:
+            data = mongo_obj.m_find_one({'_id': ObjectId(one_contact)})
+            contact_result.append(data)
+    return render_template('vacancy_add.html', vacancies=result, contact_result=contact_result)
 
 
 @app.route("/vacancy/<int:vacancy_id>/", methods=['GET', 'POST'])
