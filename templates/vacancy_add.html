@@ -20,13 +20,18 @@
 <br><b>Список вакансій:</b><br>
 <div>
     {% for vacancy in vacancies %}
-    <b>Vacancy:</b> <a href="/vacancy/{{vacancy[0]}}/">{{vacancy.id}}, {{vacancy.position_name}}, {{vacancy.company}}</a>,
-    <b>Destription:</b> {{vacancy.description}} ,
+    <b>Vacancy:</b> <a href="/vacancy/{{vacancy.id}}/">{{vacancy.id}}, {{vacancy.position_name}}, {{vacancy.company}}</a>,
+    <br><b>Destription:</b> {{vacancy.description}} ,
     <b>Comment:</b> {{vacancy.comment}}
-    <br>
-    {{contact_result}}
-    <br>----------------------<br>
+    <br><b>Contacts:</b><br>
+        {% for one_contact in vacancy.contacts %}
+            &emsp;<b>Name:</b> {{ one_contact.name }} &emsp;&emsp;
+            <b>Email:</b> {{ one_contact.email }} &emsp;&emsp;
+            <b>Phone:</b> {{ one_contact.phone }} <br>
+        {% endfor %}
+        <br>----------------------<br>
     {% endfor %}
+
 </div>
 <br> Щоб змінити вакансію, перейдіть за посиланням.
 </body>

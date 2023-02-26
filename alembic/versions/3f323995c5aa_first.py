@@ -73,7 +73,7 @@ def upgrade() -> None:
     sa.Column('position_name', sa.String(length=127), nullable=False),
     sa.Column('description', sa.String(length=255), nullable=False),
     sa.Column('comment', sa.String(length=255), nullable=False),
-    sa.Column('contact_ids', sa.String(length=127), nullable=False),
+    sa.Column('contact_ids', sa.String(length=255), nullable=False),
     sa.Column('status', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),

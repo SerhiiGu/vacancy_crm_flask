@@ -5,6 +5,7 @@ import al_db
 import email_lib
 import mongo_lib
 from bson.objectid import ObjectId
+import re
 
 from models import Vacancy, Event, User, EmailCredentials
 
@@ -14,14 +15,14 @@ app = Flask(__name__)
 @app.route("/", methods=['GET'])
 def main_proc():
     al_db.init_db()
-    mongo_obj = mongo_lib.MongoLib('vacancy_crm', 'contacts')
+    mongo_obj = mongo_lib.MongoLib()
     mongo_obj.check_create_db()
     return redirect('/vacancy/')
 
 
 @app.route("/vacancy/", methods=['GET', 'POST'])
 def vacancy():
-    mongo_obj = mongo_lib.MongoLib('vacancy_crm', 'contacts')
+    mongo_obj = mongo_lib.MongoLib()
     if request.method == 'POST':
         position_name = request.form.get('position_name')
         company = request.form.get('company')
@@ -39,32 +40,82 @@ def vacancy():
 
     result = al_db.db_session.query(Vacancy.id, Vacancy.position_name, Vacancy.company, Vacancy.description,
                                     Vacancy.comment, Vacancy.contact_ids).all()
-    contact_result = []
+    result_data = []
     for item in result:
         contacts = item[5].split(',')
+        contact_result = []
         for one_contact in contacts:
             data = mongo_obj.m_find_one({'_id': ObjectId(one_contact)})
             contact_result.append(data)
-    return render_template('vacancy_add.html', vacancies=result, contact_result=contact_result)
+        result_data.append({'id': item[0], 'position_name': item[1], 'company': item[2], 'description': item[3],
+                            'comment': item[4], 'contacts': contact_result})
+    return render_template('vacancy_add.html', vacancies=result_data)
 
 
 @app.route("/vacancy/<int:vacancy_id>/", methods=['GET', 'POST'])
 def show_vacancy_content(vacancy_id):
+    mongo_obj = mongo_lib.MongoLib()
     if request.method == 'POST':
         position_name = request.form.get('position_name')
         company = request.form.get('company')
         description = request.form.get('description')
-        contact_ids = request.form.get('contact_ids')
         comment = request.form.get('comment')
         al_db.db_session.query(Vacancy).filter(Vacancy.id == vacancy_id).update({
             Vacancy.position_name: position_name, Vacancy.company: company, Vacancy.description: description,
-            Vacancy.contact_ids: contact_ids, Vacancy.comment: comment})
+            Vacancy.comment: comment})
         al_db.db_session.commit()
     vacancy_desc = al_db.db_session.query(Vacancy.id, Vacancy.position_name, Vacancy.company, Vacancy.description,
-                                          Vacancy.comment, Vacancy.contact_ids).where(Vacancy.id == vacancy_id).first()
+                                          Vacancy.comment, Vacancy.contact_ids).where(Vacancy.id == vacancy_id).all()
     events = al_db.db_session.query(Event.id, Event.title, Event.description,
                                     Event.due_to_date).where(Event.vacancy_id == vacancy_id)
-    return render_template('vacancy_update.html', vacancy_id=vacancy_id, vacancy_desc=vacancy_desc, events=events)
+    for item in vacancy_desc:
+        contacts = item[5].split(',')
+        contact_result = []
+        for one_contact in contacts:
+            data = mongo_obj.m_find_one({'_id': ObjectId(one_contact)})
+            contact_result.append(data)
+        result_data = {'id': item[0], 'position_name': item[1], 'company': item[2], 'description': item[3],
+                       'comment': item[4], 'contacts': contact_result}
+    return render_template('vacancy_update.html', vacancy_id=vacancy_id, vacancy_desc=result_data, events=events)
+
+
+@app.route("/vacancy/<int:vacancy_id>/contacts/", methods=['GET', 'POST'])
+def change_contacts(vacancy_id):
+    mongo_obj = mongo_lib.MongoLib()
+    if request.method == 'POST':
+        record_id = request.form.get('record_id')
+        name = request.form.get('name')
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        delete = request.form.get('delete')
+        if delete:
+            mongo_obj.delete_one({"_id": ObjectId(record_id)})
+            vacancy_desc = al_db.db_session.query(Vacancy.contact_ids).where(Vacancy.id == vacancy_id).first()
+            for obj_id in vacancy_desc:
+                regex_replacements = [(rf"{record_id}", ""), (r",$", ""), (r"^,", ""), (r",,", ",")]
+                for old, new in regex_replacements:
+                    obj_id = re.sub(old, new, obj_id, flags=re.IGNORECASE)
+                al_db.db_session.query(Vacancy).filter(Vacancy.id == vacancy_id).update({Vacancy.contact_ids: obj_id})
+                al_db.db_session.commit()
+        elif record_id:
+            mongo_obj.update_one({"_id": ObjectId(record_id)}, {"$set": {"name": name, "email": email, "phone": phone}})
+        else:
+            contact_id = mongo_obj.m_insert_one({"name": name, "email": email, "phone": phone})
+            vacancy_desc = al_db.db_session.query(Vacancy.contact_ids).where(Vacancy.id == vacancy_id).first()
+            lst = f'{vacancy_desc[0]},{contact_id}'
+            al_db.db_session.query(Vacancy).filter(Vacancy.id == vacancy_id).update({Vacancy.contact_ids: lst})
+            al_db.db_session.commit()
+
+    vacancy_desc = al_db.db_session.query(Vacancy.position_name, Vacancy.company,
+                                          Vacancy.contact_ids).where(Vacancy.id == vacancy_id).all()
+    for item in vacancy_desc:
+        contacts = item[2].split(',')
+        contact_result = []
+        for one_contact in contacts:
+            data = mongo_obj.m_find_one({'_id': ObjectId(one_contact)})
+            contact_result.append(data)
+        result_data = {'position_name': item[0], 'company': item[1], 'contacts': contact_result}
+    return render_template('change_contacts.html', vacancy_id=vacancy_id, vacancy_desc=result_data)
 
 
 @app.route("/vacancy/<int:vacancy_id>/events/", methods=['GET', 'POST'])

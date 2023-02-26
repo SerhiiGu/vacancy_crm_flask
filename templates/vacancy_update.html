@@ -12,8 +12,32 @@
 </head>
 <body>
 <b>Вакансія</b> <br><br>
-{{vacancy_desc}}<br><br>
-<b>має івенти:</b> <br><br>
+
+    <b>Position name:</b>{{vacancy_desc.position_name}}
+    <br><b>Company:</b> {{vacancy_desc.company}}
+    <br><b>Destription:</b> {{vacancy_desc.description}}
+    <br><b>Comment:</b> {{vacancy_desc.comment}}
+    <br><b>Contacts:</b>&emsp;&emsp;&emsp;
+        <a href="/vacancy/{{vacancy_id}}/contacts/">додавання/зміна/видалення контактів</a><br>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        {% for one_contact in vacancy_desc.contacts %}
+        <tbody>
+            <tr>
+                <td style="border: 1px solid black;"> {{ one_contact.name }} </td>
+                <td style="border: 1px solid black;"> {{ one_contact.email }} </td>
+                <td style="border: 1px solid black;"> {{ one_contact.phone }} </td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+<br><b>має івенти:</b> <br><br>
 <div>
     <table>
         <thead>
@@ -42,7 +66,6 @@
         <tr> <td>Position_name</td> <td><input type="text" name="position_name" value="{{vacancy_desc.position_name}}"></td> </tr>
         <tr> <td>Company</td> <td><input type="text" name="company" value="{{vacancy_desc.company}}"></td> </tr>
         <tr> <td>Description</td> <td><input type="text" name="description" value="{{vacancy_desc.description}}"></td> </tr>
-        <tr> <td>Contact_ids</td> <td><input type="text" name="contact_ids" value="{{vacancy_desc.contact_ids}}"></td> </tr>
         <tr> <td>Comment</td> <td><input type="text" name="comment" value="{{vacancy_desc.comment}}"></td> </tr>
         <tr> <td></td> <td><input type="submit" value="Оновити вакансію">
     </table>
