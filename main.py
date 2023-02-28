@@ -15,8 +15,6 @@ app = Flask(__name__)
 @app.route("/", methods=['GET'])
 def main_proc():
     al_db.init_db()
-    mongo_obj = mongo_lib.MongoLib()
-    mongo_obj.check_create_db()
     return redirect('/vacancy/')
 
 
