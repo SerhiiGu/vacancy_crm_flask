@@ -35,6 +35,15 @@ class EmailCredentials(Base):
     imap_port = Column(Integer, nullable=True)
     smtp_port = Column(Integer, nullable=True)
 
+    def get_mandatory_fields(self):
+        return {'login': self.login,
+                'password': self.password,
+                'user_email': self.email,
+                'smtp_server': self.smtp_server,
+                'smtp_port': self.smtp_port,
+                'imap_server': self.imap_server,
+                'pop_server': self.pop_server}
+
     def __init__(self, login, password):
         self.login = login
         self.password = password

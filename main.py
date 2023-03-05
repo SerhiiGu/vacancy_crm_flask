@@ -7,6 +7,7 @@ import mongo_lib
 from bson.objectid import ObjectId
 import re
 
+from celery_worker import send_mail
 from models import Vacancy, Event, User, EmailCredentials
 
 app = Flask(__name__)
@@ -191,7 +192,8 @@ def user_mail():
         protocol = request.form.get('protocol')
         if recipient and message:
             message = subject + message
-            email_obj.send_email(recipient, message)
+            # email_obj.send_email(recipient, message)
+            send_mail.apply_async(args=[user_settings.id, recipient, message])
             return render_template('sent_email_success.html')
         if protocol == 'none':
             pass
@@ -216,4 +218,4 @@ def user_templates():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
