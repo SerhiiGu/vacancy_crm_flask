@@ -1,5 +1,6 @@
 # vacancy_crm_flask
 
+
 # Підготовка:
 1) Щоб тестувати пошту, треба додати свої дані в базу(тестувалося на gmail):
 INSERT INTO "email_creds" (user_id, email, login, password, pop_server, imap_server, smtp_server, pop_port, imap_port, smtp_port )
