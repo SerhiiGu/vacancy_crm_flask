@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Flask, request, render_template, redirect, session, flash, url_for
+from flask import Flask, request, render_template, redirect, session, url_for
 import al_db
 import email_lib
 import mongo_lib
@@ -139,9 +139,16 @@ def vacancy_events(vacancy_id):
         add_event = Event(vacancy_id, title, description, due_to_date, status=1)
         al_db.db_session.add(add_event)
         al_db.db_session.commit()
-    result = al_db.db_session.query(Event.id, Event.title, Event.description,
-                                    Event.due_to_date).where(Event.vacancy_id == vacancy_id)
-    return render_template('event_add.html', vacancy_id=vacancy_id, events=result)
+
+    user_id = al_db.db_session.query(Vacancy.user_id).filter(Vacancy.id == vacancy_id).first()
+    if user_id is None:
+        return render_template('error.html', message="Ви щось зробили неправильно, або ж перервано спробу хаку")
+    if user_id[0] == session.get('user_id'):
+        result = al_db.db_session.query(Event.id, Event.title, Event.description,
+                                        Event.due_to_date).where(Event.vacancy_id == vacancy_id)
+        return render_template('event_add.html', vacancy_id=vacancy_id, events=result)
+    else:
+        return render_template('error.html', message="Щось пішло не так, або ж перервано спробу хаку")
 
 
 @app.route("/vacancy/<int:vacancy_id>/events/<int:event_id>/", methods=['GET', 'POST'])
@@ -155,9 +162,16 @@ def show_event_content(vacancy_id, event_id):
         al_db.db_session.query(Event).filter(Event.id == event_id, Event.vacancy_id == vacancy_id). \
             update({Event.title: title, Event.description: description, Event.due_to_date: due_to_date})
         al_db.db_session.commit()
-    event = al_db.db_session.query(Event.id, Event.title, Event.description, Event.due_to_date). \
-        where(Event.id == event_id, Event.vacancy_id == vacancy_id).first()
-    return render_template('event_update.html', vacancy_id=vacancy_id, event_id=event_id, event=event)
+
+    event_belong = al_db.db_session.query(Event.id, Event.vacancy_id, Event.title, Event.description). \
+        filter(Event.id == event_id, Event.vacancy_id == vacancy_id).all()
+    user_belong = al_db.db_session.query(Vacancy.user_id).filter(Vacancy.id == vacancy_id).first()
+    if event_belong and user_belong and user_belong[0] == session.get('user_id'):
+        event = al_db.db_session.query(Event.id, Event.title, Event.description, Event.due_to_date). \
+            where(Event.id == event_id, Event.vacancy_id == vacancy_id).first()
+        return render_template('event_update.html', vacancy_id=vacancy_id, event_id=event_id, event=event)
+    else:
+        return render_template('error.html', message="Щось пішло не так, або ж перервано спробу хаку")
 
 
 @app.route("/vacancy/<vacancy_id>/history/", methods=['GET'])

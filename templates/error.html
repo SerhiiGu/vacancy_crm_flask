@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <meta charset="UTF-8">
+    <title>Помилка!</title>
+</head>
+<body>
+{% if message != None %}
+<br>
+<h4>{{ message }}</h4>
+<br>
+{% endif %}
+
+<br><br>&emsp;&emsp;&emsp;<b><a href="/user/">Додому</a></b>&emsp;
+&emsp;&emsp;&emsp;&emsp;<b><a href="/vacancy/">До списку вакансій</a></b>
+
+</body>
+</html>
