@@ -1,6 +1,6 @@
 import datetime
 
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session, flash, url_for
 import al_db
 import email_lib
 import mongo_lib
@@ -11,6 +11,7 @@ from celery_worker import send_mail
 from models import Vacancy, Event, User, EmailCredentials
 
 app = Flask(__name__)
+app.secret_key = 'f5d24c22ee66171979a78155d54b656fcea6a51b0ad49b3892393a08ebac7795'
 
 
 @app.route("/", methods=['GET'])
@@ -21,6 +22,8 @@ def main_proc():
 
 @app.route("/vacancy/", methods=['GET', 'POST'])
 def vacancy():
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     mongo_obj = mongo_lib.MongoLib()
     if request.method == 'POST':
         position_name = request.form.get('position_name')
@@ -33,12 +36,14 @@ def vacancy():
 
         contact_id = mongo_obj.m_insert_one({"name": contact_name, "email": contact_email, "phone": contact_phone})
 
-        current_vacancy = Vacancy(position_name, company, description, str(contact_id), comment, status=1, user_id=1)
+        current_vacancy = Vacancy(position_name, company, description, str(contact_id), comment,
+                                  status=1, user_id=session.get('user_id'))
         al_db.db_session.add(current_vacancy)
         al_db.db_session.commit()
 
     result = al_db.db_session.query(Vacancy.id, Vacancy.position_name, Vacancy.company, Vacancy.description,
-                                    Vacancy.comment, Vacancy.contact_ids).all()
+                                    Vacancy.comment, Vacancy.contact_ids).\
+        filter_by(user_id=session.get('user_id')).all()
     result_data = []
     for item in result:
         contacts = item[5].split(',')
@@ -53,6 +58,8 @@ def vacancy():
 
 @app.route("/vacancy/<int:vacancy_id>/", methods=['GET', 'POST'])
 def show_vacancy_content(vacancy_id):
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     mongo_obj = mongo_lib.MongoLib()
     if request.method == 'POST':
         position_name = request.form.get('position_name')
@@ -64,7 +71,8 @@ def show_vacancy_content(vacancy_id):
             Vacancy.comment: comment})
         al_db.db_session.commit()
     vacancy_desc = al_db.db_session.query(Vacancy.id, Vacancy.position_name, Vacancy.company, Vacancy.description,
-                                          Vacancy.comment, Vacancy.contact_ids).where(Vacancy.id == vacancy_id).all()
+                                          Vacancy.comment, Vacancy.contact_ids).\
+        where(Vacancy.id == vacancy_id).filter_by(user_id=session.get('user_id')).all()
     events = al_db.db_session.query(Event.id, Event.title, Event.description,
                                     Event.due_to_date).where(Event.vacancy_id == vacancy_id)
     for item in vacancy_desc:
@@ -80,6 +88,8 @@ def show_vacancy_content(vacancy_id):
 
 @app.route("/vacancy/<int:vacancy_id>/contacts/", methods=['GET', 'POST'])
 def change_contacts(vacancy_id):
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     mongo_obj = mongo_lib.MongoLib()
     if request.method == 'POST':
         record_id = request.form.get('record_id')
@@ -89,7 +99,8 @@ def change_contacts(vacancy_id):
         delete = request.form.get('delete')
         if delete:
             mongo_obj.delete_one({"_id": ObjectId(record_id)})
-            vacancy_desc = al_db.db_session.query(Vacancy.contact_ids).where(Vacancy.id == vacancy_id).first()
+            vacancy_desc = al_db.db_session.query(Vacancy.contact_ids).where(Vacancy.id == vacancy_id).\
+                filter_by(user_id=session.get('user_id')).first()
             for obj_id in vacancy_desc:
                 regex_replacements = [(rf"{record_id}", ""), (r",$", ""), (r"^,", ""), (r",,", ",")]
                 for old, new in regex_replacements:
@@ -105,8 +116,8 @@ def change_contacts(vacancy_id):
             al_db.db_session.query(Vacancy).filter(Vacancy.id == vacancy_id).update({Vacancy.contact_ids: lst})
             al_db.db_session.commit()
 
-    vacancy_desc = al_db.db_session.query(Vacancy.position_name, Vacancy.company,
-                                          Vacancy.contact_ids).where(Vacancy.id == vacancy_id).all()
+    vacancy_desc = al_db.db_session.query(Vacancy.position_name, Vacancy.company, Vacancy.contact_ids).\
+        where(Vacancy.id == vacancy_id).filter_by(user_id=session.get('user_id')).all()
     for item in vacancy_desc:
         contacts = item[2].split(',')
         contact_result = []
@@ -119,6 +130,8 @@ def change_contacts(vacancy_id):
 
 @app.route("/vacancy/<int:vacancy_id>/events/", methods=['GET', 'POST'])
 def vacancy_events(vacancy_id):
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     if request.method == 'POST':
         description = request.form.get('description')
         title = request.form.get('title')
@@ -133,6 +146,8 @@ def vacancy_events(vacancy_id):
 
 @app.route("/vacancy/<int:vacancy_id>/events/<int:event_id>/", methods=['GET', 'POST'])
 def show_event_content(vacancy_id, event_id):
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     if request.method == 'POST':
         description = request.form.get('description')
         title = request.form.get('title')
@@ -147,31 +162,71 @@ def show_event_content(vacancy_id, event_id):
 
 @app.route("/vacancy/<vacancy_id>/history/", methods=['GET'])
 def vacancy_history():
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     return 'vacancy history'
+
+
+@app.route("/user/registration/", methods=['GET', 'POST'])
+def func_user_registration():
+    if request.method == 'POST':
+        user_login = request.form.get('user_login')
+        user_password = request.form.get('user_password')
+        user_email = request.form.get('user_email')
+        user_name = request.form.get('user_name')
+        user_add = User(login=user_login, password=user_password, email=user_email, name=user_name)
+        al_db.db_session.add(user_add)
+        al_db.db_session.commit()
+        return redirect(url_for('func_user_login'))
+    return render_template('user_registration.html')
+
+
+@app.route("/user/login/", methods=['GET', 'POST'])
+def func_user_login():
+    if request.method == 'POST':
+        user_login = request.form.get('user_login')
+        user_password = request.form.get('user_password')
+        user_obj = al_db.db_session.query(User).filter(User.login == user_login).first()
+        if user_obj is None:
+            return render_template('user_login.html',
+                message="Користувач не знайдений! Можливо, ви помилилися, або ж вам потрібно зареєструватися")
+        if user_login != user_obj.login or user_obj.password != user_password:
+            return render_template('user_login.html',
+                                   message="Login failed! Check your username and password!")
+        else:
+            session['user_id'] = user_obj.id
+            session['user_login'] = user_obj.login
+            return redirect(url_for('user_main_page'))
+    return render_template('user_login.html', message=None)
+
+
+@app.route("/user/logout/", methods=['GET', 'POST'])
+def func_user_logout():
+    session.pop('user_id', None)
+    session.pop('user_login', None)
+    return render_template('user_login.html',
+                           message="Ви вийшли з системи. Перенаправлено на сторінку входу...")
 
 
 @app.route("/user/", methods=['GET', 'POST'])
 def user_main_page():
-    if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        login = request.form.get('login')
-        password = request.form.get('password')
-        add_user = User(name, email, login, password)
-        al_db.db_session.add(add_user)
-        al_db.db_session.commit()
-    result = al_db.db_session.query(User.id, User.name, User.email, User.login, User.password).all()
-    return render_template('user_add.html', users=result)
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
+    return render_template('user_home.html', user_name=session.get('user_login'))
 
 
 @app.route("/user/calendar/", methods=['GET'])
 def user_calendar():
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     return 'user calendar'
 
 
 @app.route("/user/mail/", methods=['GET', 'POST'])
 def user_mail():
-    user_settings = al_db.db_session.query(EmailCredentials).filter_by(user_id=1).first()
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
+    user_settings = al_db.db_session.query(EmailCredentials).filter_by(user_id=session.get('user_id')).first()
     email_obj = email_lib.EmailWrapper(
         user_settings.email,
         user_settings.login,
@@ -204,18 +259,24 @@ def user_mail():
 
 @app.route("/user/settings/", methods=['GET', 'PUT'])
 def user_settings_page():
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     return 'user settings'
 
 
 @app.route("/user/documents/", methods=['GET', 'POST', 'PUT', 'DELETE'])
 def user_documents():
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     return 'user documents'
 
 
 @app.route("/user/templates/", methods=['GET', 'POST', 'PUT', 'DELETE'])
 def user_templates():
+    if session.get('user_id', None) is None:
+        return redirect(url_for('func_user_login'))
     return 'user templates'
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)

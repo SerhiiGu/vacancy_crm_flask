@@ -20,7 +20,7 @@
 <br><b>Список вакансій:</b><br>
 <div>
     {% for vacancy in vacancies %}
-    <b>Vacancy:</b> <a href="/vacancy/{{vacancy.id}}/">{{vacancy.id}}, {{vacancy.position_name}}, {{vacancy.company}}</a>,
+    <b>Vacancy:</b> <i><a href="/vacancy/{{vacancy.id}}/">{{vacancy.id}}, {{vacancy.position_name}}, {{vacancy.company}}</a></i>
     <br><b>Destription:</b> {{vacancy.description}} ,
     <b>Comment:</b> {{vacancy.comment}}
     <br><b>Contacts:</b><br>
@@ -34,5 +34,7 @@
 
 </div>
 <br> Щоб змінити вакансію, перейдіть за посиланням.
+
+<br><br>&emsp;&emsp;&emsp;<b><a href="/user/">Додому</a></b>
 </body>
 </html>
