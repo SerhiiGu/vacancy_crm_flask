@@ -75,6 +75,8 @@ def show_vacancy_content(vacancy_id):
         where(Vacancy.id == vacancy_id).filter_by(user_id=session.get('user_id')).all()
     events = al_db.db_session.query(Event.id, Event.title, Event.description,
                                     Event.due_to_date).where(Event.vacancy_id == vacancy_id)
+    if not vacancy_desc:
+        return render_template('error.html', message="Щось пішло не так(vacancy), або ж перервано спробу хаку")
     for item in vacancy_desc:
         contacts = item[5].split(',')
         contact_result = []
@@ -118,6 +120,8 @@ def change_contacts(vacancy_id):
 
     vacancy_desc = al_db.db_session.query(Vacancy.position_name, Vacancy.company, Vacancy.contact_ids).\
         where(Vacancy.id == vacancy_id).filter_by(user_id=session.get('user_id')).all()
+    if not vacancy_desc:
+        return render_template('error.html', message="Щось пішло не так(contacts), або ж перервано спробу хаку")
     for item in vacancy_desc:
         contacts = item[2].split(',')
         contact_result = []
@@ -142,7 +146,7 @@ def vacancy_events(vacancy_id):
 
     user_id = al_db.db_session.query(Vacancy.user_id).filter(Vacancy.id == vacancy_id).first()
     if user_id is None:
-        return render_template('error.html', message="Ви щось зробили неправильно, або ж перервано спробу хаку")
+        return render_template('error.html', message="Щось пішло не так(events), або ж перервано спробу хаку")
     if user_id[0] == session.get('user_id'):
         result = al_db.db_session.query(Event.id, Event.title, Event.description,
                                         Event.due_to_date).where(Event.vacancy_id == vacancy_id)
@@ -171,7 +175,7 @@ def show_event_content(vacancy_id, event_id):
             where(Event.id == event_id, Event.vacancy_id == vacancy_id).first()
         return render_template('event_update.html', vacancy_id=vacancy_id, event_id=event_id, event=event)
     else:
-        return render_template('error.html', message="Щось пішло не так, або ж перервано спробу хаку")
+        return render_template('error.html', message="Щось пішло не так(event_id), або ж перервано спробу хаку")
 
 
 @app.route("/vacancy/<vacancy_id>/history/", methods=['GET'])
@@ -206,7 +210,7 @@ def func_user_login():
                 message="Користувач не знайдений! Можливо, ви помилилися, або ж вам потрібно зареєструватися")
         if user_login != user_obj.login or user_obj.password != user_password:
             return render_template('user_login.html',
-                                   message="Login failed! Check your username and password!")
+                                   message="Невдала спроба входу! Перевірте правильність логіну/паролю.")
         else:
             session['user_id'] = user_obj.id
             session['user_login'] = user_obj.login
