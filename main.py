@@ -208,7 +208,7 @@ def func_user_login():
         if user_obj is None:
             return render_template('user_login.html',
                 message="Користувач не знайдений! Можливо, ви помилилися, або ж вам потрібно зареєструватися")
-        if user_login != user_obj.login or user_obj.password != user_password:
+        if user_obj.password != user_password:
             return render_template('user_login.html',
                                    message="Невдала спроба входу! Перевірте правильність логіну/паролю.")
         else:
